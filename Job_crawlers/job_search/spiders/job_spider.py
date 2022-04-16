@@ -45,8 +45,15 @@ class JobSpider(scrapy.Spider):
             vacancy_url = vacancy_block.xpath(
                 './/h3[@class="bloko-header-section-3"]//a[@class="bloko-link"]/@href').get()
             vacancies_details_urls.append(vacancy_url)
+
         for vacancy_detail_url in vacancies_details_urls:
             yield scrapy.Request(vacancy_detail_url, self.parse_details)
+
+        next_page = response.xpath('//a[@data-qa="pager-next"]/@href').get()
+        if next_page is not None:
+            next_page = response.urljoin(next_page)
+            yield scrapy.Request(next_page, callback=self.parse)
+
 
 
 
